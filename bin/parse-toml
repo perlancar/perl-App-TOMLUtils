@@ -1,0 +1,54 @@
+#!perl
+
+# DATE
+# VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::TOMLUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{parse_toml} = {
+    v => 1.1,
+    summary => 'Parse TOML using TOML::Parser and show the raw result',
+    description => <<'_',
+
+Mostly only useful for developer for debugging purposes.
+
+_
+    args => {
+        %App::TOMLUtils::common_args,
+    },
+    result_naked => 1,
+    'cmdline.default_format' => 'json-pretty',
+};
+sub parse_toml {
+    my %args = @_;
+
+    my $parser = App::TOMLUtils::_get_parser(\%args);
+
+    $parser->parse($args{toml});
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/parse_toml',
+    pass_cmdline_object => 1,
+);
+
+# so help message can be more helpful
+$cli->common_opts->{format}{default} = 'json-pretty';
+$cli->common_opts->{naked_res}{default} = 1;
+
+$cli->run;
+
+# ABSTRACT:
+# PODNAME:
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % parse-toml /path/to/file.toml
